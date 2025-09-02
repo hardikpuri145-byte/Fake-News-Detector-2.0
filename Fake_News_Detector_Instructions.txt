@@ -1,0 +1,71 @@
+
+# Fake News Detector App - Instructions and Code
+
+## Files Needed:
+1. app.py (Main application code)
+2. requirements.txt (List of dependencies)
+
+---
+
+## app.py Code:
+
+import streamlit as st
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+# --- Title ---
+st.title("📰 Fake News Detector")
+
+# --- Sample Data for Model Training ---
+data = {
+    "text": [
+        "Breaking: Celebrity found alive on Mars!",
+        "Government announces new healthcare scheme for rural areas.",
+        "Aliens invade Earth, world leaders surrender.",
+        "Scientists discover water on the Moon, ISRO confirms.",
+        "COVID-19 vaccines are safe and effective, say doctors."
+    ],
+    "label": [1, 0, 1, 0, 0]  # 1 = Fake, 0 = Real
+}
+
+df = pd.DataFrame(data)
+
+# --- Model Training ---
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(df["text"])
+y = df["label"]
+
+model = MultinomialNB()
+model.fit(X, y)
+
+# --- User Input ---
+st.subheader("Check Your News:")
+user_input = st.text_area("Enter news headline or article:")
+
+# --- Prediction ---
+if st.button("Check"):
+    if user_input.strip() != "":
+        input_vector = vectorizer.transform([user_input])
+        prediction = model.predict(input_vector)[0]
+        if prediction == 1:
+            st.error("🚨 This news seems **FAKE**!")
+        else:
+            st.success("✅ This news seems **REAL**.")
+    else:
+        st.warning("Please enter some text to check.")
+
+---
+
+## requirements.txt Content:
+streamlit
+scikit-learn
+pandas
+
+---
+
+## How to Deploy on Streamlit Cloud:
+1. Upload both files to GitHub in a new repository.
+2. Go to https://share.streamlit.io and log in.
+3. Click "New App" → Choose your repo → Branch: main → File: app.py → Deploy.
+4. Wait for deployment; your app link will be generated.
